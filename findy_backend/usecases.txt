@@ -1,0 +1,35 @@
+login
+signup
+update profile
+create post
+view all posted items
+delete post
+update post 
+view (personal post){lost or found posts}
+message another user
+claim item
+view history
+create transaction
+reject transaction
+accept transaction
+view transactions
+
+
+
+sample item object for postman: 
+{
+  "title": "brown bag lost at u-block A",
+  "name": "Adiddas backpack",
+  "description": "a fairly used brown bag of addidas brand with 2 pockets, a small one and a big one. There is an image of a cartoon girl on it",
+  "additionalInfo": {
+      "color": "brown", 
+      "brand": "adiddas", 
+      "state": "fairly used",
+      "content": "books"
+  } ,
+  "location": "u-block",
+   "type" :"lost",
+   "reporterId": "666f3875e1400843374ec080",
+   "category" : "bags", 
+   "imageUrl": "https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.adidas.com.my%2Fen%2Fmust-haves-backpack%2FHN8191.html&psig=AOvVaw1iTPy20h65jf7MU5MjpLgy&ust=1718660365062000&source=images&cd=vfe&opi=89978449&ved=0CBEQjRxqFwoTCKDHofmK4YYDFQAAAAAdAAAAABAE"
+}
