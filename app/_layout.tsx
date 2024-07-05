@@ -7,7 +7,7 @@ import { useEffect } from 'react';
 import 'react-native-reanimated';
 import "../styles/global.css"
 import { useColorScheme } from '@/components/useColorScheme';
-
+import { PaperProvider } from 'react-native-paper';
 export {
   // Catch any errors thrown by the Layout component.
   ErrorBoundary,
@@ -49,6 +49,7 @@ function RootLayoutNav() {
   const colorScheme = useColorScheme();
 
   return (
+<PaperProvider>
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <Stack>
         {/* <Stack.Screen name="(welcome)" options={{headerShown: false}}/>  */}
@@ -56,5 +57,6 @@ function RootLayoutNav() {
         <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
       </Stack>
     </ThemeProvider>
+    </PaperProvider>
   );
 }

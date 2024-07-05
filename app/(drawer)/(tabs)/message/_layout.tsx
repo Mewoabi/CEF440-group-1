@@ -29,7 +29,7 @@ export default function _layout() {
       }
     
     }>
-      <TabsNavigator.Screen name="index" options={{title:"Lost"}}/>
+      <TabsNavigator.Screen name="index" options={{title:"Seen"}}/>
       <TabsNavigator.Screen name="inbox" options={{title:"Found"}}/>
     </TabsNavigator>
     </>

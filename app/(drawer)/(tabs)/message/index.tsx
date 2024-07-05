@@ -26,7 +26,7 @@ const MessagesScreen = () => {
   const renderItem = ({ item }:any) => (
     <Link 
    href={{
-    pathname: '/chat/[user]',
+    pathname: '/chat',
     params: { name: item.name,avatar:item.avatar, time: item.time, message: item.message }
    }}>
     <View style={styles.messageContainer}>
