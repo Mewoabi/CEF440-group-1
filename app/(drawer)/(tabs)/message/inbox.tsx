@@ -10,6 +10,7 @@ const inbox = () => {
        <Button icon="camera" mode="contained" onPress={() => router.push('/message/notification')}>
     Press me
   </Button>
+  
     </View>
   )
 }
