@@ -3,6 +3,7 @@ import { View, Image, StyleSheet, Text, TextInput, TouchableOpacity } from 'reac
 import { GiftedChat, Send, IMessage, InputToolbar } from 'react-native-gifted-chat';
 import Icon from '@expo/vector-icons/MaterialIcons';
 import { RouteProp, useRoute } from '@react-navigation/native';
+import ChatHeader from './ChatHeader';
 
 type RouteParams = {
   ChatScreen: {
@@ -25,8 +26,8 @@ const ChatScreen: React.FC = () => {
         createdAt: new Date(),
         user: {
           _id: 2,
-          name: 'Jhon Abraham',
-          avatar: 'https://example.com/avatar.jpg',
+          name: name,
+          avatar: avatar,
         },
       },
       {
@@ -91,13 +92,7 @@ const ChatScreen: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <Image style={styles.avatar} source={{ uri: avatar }} />
-        <View>
-          <Text style={styles.name}>{name}</Text>
-          <Text style={styles.status}>Active now</Text>
-        </View>
-      </View>
+      <ChatHeader name={name} avatar={avatar} status='online'/>
    
       <GiftedChat
         messages={messages}
@@ -119,6 +114,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f5f5f5',
+    paddingBottom:20
   },
   header: {
     flexDirection: 'row',

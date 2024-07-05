@@ -55,6 +55,8 @@ function RootLayoutNav() {
         {/* <Stack.Screen name="(welcome)" options={{headerShown: false}}/>  */}
         <Stack.Screen name="(drawer)" options={{ headerShown: false }} />
         <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
+        <Stack.Screen name='chat' options={{headerShown:false}}/>
+        <Stack.Screen name='notifications/index' options={{headerShown:false}}/>
       </Stack>
     </ThemeProvider>
     </PaperProvider>

@@ -21,13 +21,13 @@ export default function index() {
   
     return (
       <Portal>
-        <Dialog visible={visible} onDismiss={hideDialog}>
+        <Dialog dismissable={false} visible={visible} onDismiss={hideDialog}>
           <Dialog.Title className='items-center'>Account Deleted</Dialog.Title>
           <Dialog.Content>
             <Text>na u delete ur account, na ur businesss</Text>
           </Dialog.Content>
           <Dialog.Actions>
-            <Button className='text-[#F3A3A6]' onPress={() => console.log("bye")}>Logout</Button>
+            <Button className='text-[#F3A3A6]' onPress={() => setVisible(false)}>Logout</Button>
         
           </Dialog.Actions>
         </Dialog>
