@@ -14,6 +14,12 @@ export default function RootLayout() {
   const colorScheme = useColorScheme();
   const [loaded] = useFonts({
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
+    Poppins_Bold: require('../assets/fonts/Poppins/Poppins-Bold.ttf'),
+    Poppins_Medium: require('../assets/fonts/Poppins/Poppins-Medium.ttf'),
+    Poppins_Regular: require('../assets/fonts/Poppins/Poppins-Regular.ttf'),
+    Poppins_SemiBold: require('../assets/fonts/Poppins/Poppins-SemiBold.ttf'),
+    Poppins_Thin: require('../assets/fonts/Poppins/Poppins-Thin.ttf'),
+    Poppins_Light: require('../assets/fonts/Poppins/Poppins-Light.ttf'),
   });
 
   useEffect(() => {
@@ -28,10 +34,16 @@ export default function RootLayout() {
 
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+      <Stack screenOptions={{
+        headerShown: false
+      }}>
+        {/* this index stands for the welcome page and it is the first page i want someone to see when the enter the app */}
+        <Stack.Screen name="index" options={{ headerShown: false }} />  
+        <Stack.Screen name="(drawer)" options={{ headerShown: false }} /> 
+        <Stack.Screen name="(sidepages)" options={{ headerShown: false }} /> 
         <Stack.Screen name="+not-found" />
       </Stack>
     </ThemeProvider>
   );
 }
+ 

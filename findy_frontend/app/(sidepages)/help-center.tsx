@@ -3,10 +3,10 @@ import React from 'react'
 import { ThemedView } from '@/components/ThemedView'
 import { ThemedText } from '@/components/ThemedText'
 
-export default function inboxPage() {
+export default function helpCenterPage() {
     return ( 
             <ThemedView>
-                <ThemedText style={styles.textmargin}>all your messages</ThemedText>
+                <ThemedText style={styles.textmargin}>Welcome to the help center page</ThemedText>
             </ThemedView> 
     )
 }

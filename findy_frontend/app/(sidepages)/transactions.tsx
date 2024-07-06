@@ -3,10 +3,10 @@ import React from 'react'
 import { ThemedView } from '@/components/ThemedView'
 import { ThemedText } from '@/components/ThemedText'
 
-export default function myPostsPage() {
+export default function transactionsPage() {
     return ( 
             <ThemedView>
-                <ThemedText style={styles.textmargin}>myPostsPage</ThemedText>
+                <ThemedText style={styles.textmargin}>all transactions</ThemedText>
             </ThemedView> 
     )
 }
