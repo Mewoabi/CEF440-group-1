@@ -1,28 +1,12 @@
-const mongoose = require('mongoose')
-const bcrypt = require('bcrypt')
-const validator = require('validator')
+const mongoose = require('mongoose');
 
-const Schema = mongoose.Schema
+const Schema = mongoose.Schema;
 
 const sessionSchema = new Schema({
-  session: {
-    type: String,
+  participants: {
+    type: [String], // Array of user IDs
     required: true  
-  },
-  sender: {
-    type: String,
-    required: true  
-  },
-  receiver: {
-    type: String,
-    required: true  
-  },
-  content: {
-    type: String,
-    required: true
   }
-}, {timestamps: true})
- 
- 
+}, {timestamps: true});
 
-module.exports = mongoose.model('Session', sessionSchema)
+module.exports = mongoose.model('Session', sessionSchema);

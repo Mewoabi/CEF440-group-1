@@ -3,67 +3,59 @@ const cors = require('cors');
 const express = require('express');
 const mongoose = require('mongoose');
 const http = require('http');
-const socketIO = require('socket.io');
-const Message = require('./models/messageModel');
-const itemRoutes = require('./routes/item');
-const userRoutes = require('./routes/user');
-const messageRoutes = require('./routes/message');
-const sessionRoutes = require('./routes/session');
+const { Server } = require('socket.io');
 
-// Express app
+// Create express app
 const app = express();
 const server = http.createServer(app);
-const io = socketIO(server, {
-  cors: {
-    origin: '*',
-  },
-});
+const io = require('socket.io')(http, {
+    cors: {
+      origin: '*', // Allow all origins
+    }
+  });
 
 mongoose.set('strictQuery', false);
 
 // Middleware
 app.use(express.json());
-app.use(cors());
+app.use(cors())
 app.use((req, res, next) => {
   console.log(req.path, req.method);
   next();
 });
 
+// Mongoose model for messages
+const messageSchema = new mongoose.Schema({
+  text: String,
+  createdAt: Date,
+  user: {
+    _id: Number,
+    name: String,
+    avatar: String,
+  },
+});
+
+const Message = mongoose.model('Message', messageSchema);
+
 // Socket.io configuration
 io.on('connection', (socket) => {
   console.log(`⚡: ${socket.id} user just connected!`);
 
-  socket.on('joinSession', ({ session, user }) => {
-    socket.join(session);
-    console.log(`${user} joined session: ${session}`);
-  });
-
   socket.on('sendMessage', async (message) => {
     const newMessage = new Message(message);
     await newMessage.save();
-    console.log(newMessage);
-    io.to(message.session).emit('receiveMessage', message);
+    io.emit('receiveMessage', message);
   });
 
   socket.on('disconnect', () => {
     console.log('🔥: A user disconnected');
   });
 });
-app.get('/api/messages/:session', async (req, res) => {
-  const { session } = req.params;
-  try {
-    const messages = await Message.find({ session }).sort({ createdAt: -1 }).exec();
-    res.json(messages);
-  } catch (error) {
-    res.status(400).json({ error: error.message });
-  }
-});
 
-// Routes
-app.use('/api/message', messageRoutes);
-app.use('/api/item', itemRoutes);
-app.use('/api/user', userRoutes);
-app.use('/api/session', sessionRoutes);
+app.get('/api/messages', async (req, res) => {
+  const messages = await Message.find().sort({ createdAt: -1 }).exec();
+  res.json(messages);
+});
 
 // Connect to DB and start server
 mongoose
