@@ -50,8 +50,9 @@ export default function RootLayout() {
             <Stack.Screen name="+not-found" />
           </Stack>
         </ThemeProvider>
-    </PaperProvider>
+   
       </PostContextProvider>
     </UserContextProvider>
+    </PaperProvider>
   );
 }

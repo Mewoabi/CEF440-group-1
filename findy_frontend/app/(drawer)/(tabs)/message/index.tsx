@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { View, Text, FlatList, StyleSheet, Image, ActivityIndicator, RefreshControl, TouchableOpacity } from 'react-native';
 import axios from 'axios';
 
-const ENDPOINT = 'http://192.168.8.105:5500'; // Replace with your server's URL
+const ENDPOINT = 'http://192.168.43.43:5500'; // Replace with your server's URL
 
 const MessagesScreen = () => {
   const [users, setUsers] = useState([]);

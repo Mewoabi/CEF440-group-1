@@ -15,7 +15,7 @@ type RouteParams = {
   };
 };
 
-const ENDPOINT = 'http://192.168.8.105:5500'; // Replace with your server's URL
+const ENDPOINT = 'http://192.168.43.43:5500'; // Replace with your server's URL
 
 const ChatScreen: React.FC = () => {
   const route = useRoute<RouteProp<RouteParams, 'ChatScreen'>>();
