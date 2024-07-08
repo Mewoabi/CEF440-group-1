@@ -1,5 +1,4 @@
-import React from 'react';
-import { View, StyleSheet } from 'react-native';
+import  { View, StyleSheet } from 'react-native';
 import { Avatar, Text, IconButton, Icon } from 'react-native-paper';
 import { useNavigation } from 'expo-router';
 interface ChatHeaderProps {
@@ -8,11 +7,11 @@ interface ChatHeaderProps {
   status: string;
 }
 
-const ChatHeader: React.FC<ChatHeaderProps> = ({ avatar, name, status }) => {
+const ChatHeader: React.FC<ChatHeaderProps> = ({ avatar, name, status }:ChatHeaderProps) => {
   const Navigate=useNavigation()
   return (
     <View style={styles.container}>
-      <IconButton onPress={()=>Navigate.goBack()} icon='status'/>
+      <IconButton onPress={()=>Navigate.goBack()} icon='keyboard-backspace'/>
       <Avatar.Image size={40} source={{ uri: avatar }} />
       <View style={styles.infoContainer}>
         <Text style={styles.name}>{name}</Text>

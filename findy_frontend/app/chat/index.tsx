@@ -1,163 +1,97 @@
-import React, { useState, useEffect } from 'react';
-import { View, Image, StyleSheet, Text, TextInput, TouchableOpacity } from 'react-native';
-import { GiftedChat, Send, IMessage, InputToolbar } from 'react-native-gifted-chat';
-import Icon from '@expo/vector-icons/MaterialIcons';
-import { RouteProp, useRoute } from '@react-navigation/native';
-import ChatHeader from './ChatHeader';
+ import { Link, useRouter } from 'expo-router';
+import  { useEffect, useState } from 'react';
+import { View, Text, FlatList, StyleSheet, Image } from 'react-native';
+import axios from 'axios';
 
-type RouteParams = {
-  ChatScreen: {
-    name: string;
-    avatar: string;
-  };
-};
+const ENDPOINT = 'http://192.168.0.196:5500'; // Replace with your server's URL
 
-const ChatScreen: React.FC = () => {
-  const route = useRoute<RouteProp<RouteParams, 'ChatScreen'>>();
-  const { name, avatar } = route.params;
-  const [messages, setMessages] = useState<IMessage[]>([]);
-  const [input, setInput] = useState('');
+const MessagesScreen = () => {
+  const [users, setUsers] = useState([]);
+  const router = useRouter();
 
   useEffect(() => {
-    setMessages([
-      {
-        _id: 1,
-        text: 'Can I get proof?',
-        createdAt: new Date(),
-        user: {
-          _id: 2,
-          name: name,
-          avatar: avatar,
-        },
-      },
-      {
-        _id: 2,
-        text: 'Hey, I saw an ad on the missing AirPods. They\'re mine.',
-        createdAt: new Date(),
-        user: {
-          _id: 1,
-          name: 'User',
-        },
-      },
-    ]);
+    const fetchUsers = async () => {
+      try {
+        const response = await axios.get(`${ENDPOINT}/auth/user/users`);
+        
+        setUsers(response?.data);
+        console.log(users)
+      } catch (error) {
+        console.error('Failed to fetch users:', error);
+      }
+    };
+
+    fetchUsers();
   }, []);
 
-  const onSend = (newMessages: IMessage[] = []) => {
-    setMessages((previousMessages) => GiftedChat.append(previousMessages, newMessages));
-    setInput('');
-  };
-
-  const handleSend = () => {
-    if (input.trim()) {
-      const newMessage: IMessage = {
-        _id: messages.length + 1,
-        text: input,
-        createdAt: new Date(),
-        user: {
-          _id: 1,
-          name: 'User',
-        },
-      };
-      onSend([newMessage]);
-    }
-  };
-
-  const renderSend = (props: any) => (
-    <Send {...props}>
-      <View style={styles.sendingContainer}>
-        <Icon name="send" size={28} color="#007AFF" />
+  const renderItem = ({ item }:any) => (
+    <Link 
+      href={{
+        pathname: '/chat',
+        params: { 
+          name: item.username,
+          avatar: item.profileImage,
+          session: 'new session', // You might want to dynamically generate or fetch the session
+        }
+      }}>
+      <View style={styles.messageContainer}>
+        <Image source={{ uri: item.avatar }} style={styles.avatar} />
+        <View style={styles.messageContent}>
+          <View style={styles.messageHeader}>
+            <Text style={styles.name}>{item.username}</Text>
+            <Text style={styles.time}>Active now</Text>
+          </View>
+          <Text style={styles.message}>Start chatting with {item.username}</Text>
+        </View>
       </View>
-    </Send>
-  );
-
-  const renderInputToolbar = (props: any) => (
-    <View className=''>
-    <View style={styles.bottomBar}>
-      <TouchableOpacity style={styles.icon}>
-        <Icon name="attach-file" size={28} color="#007AFF" />
-      </TouchableOpacity>
-      <TextInput
-        style={styles.input}
-        placeholder="Write your message..."
-        value={input}
-        onChangeText={setInput}
-        onSubmitEditing={handleSend}
-      />
-      <TouchableOpacity style={styles.icon} onPress={handleSend}>
-        <Icon name="send" size={28} color="#007AFF" />
-      </TouchableOpacity>
-    </View>
-    </View>
+    </Link>
   );
 
   return (
-    <View style={styles.container}>
-      <ChatHeader name={name} avatar={avatar} status='online'/>
-   
-      <GiftedChat
-        messages={messages}
-        onSend={(messages) => onSend(messages)}
-        user={{
-          _id: 1,
-          name: 'User',
-        }}
-        renderSend={renderSend}
-        renderInputToolbar={renderInputToolbar}
-        placeholder="Write your message..."
-      />
-      </View>
-    
+    <FlatList
+      data={users}
+      keyExtractor={(item) => item?._id}
+      renderItem={renderItem}
+      contentContainerStyle={styles.list}
+    />
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f5f5f5',
-    paddingBottom:20
+  list: {
+    padding: 16,
+    backgroundColor: 'white',
   },
-  header: {
+  messageContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 10,
-    backgroundColor: '#fff',
+    paddingVertical: 15,
   },
   avatar: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    marginRight: 10,
+    marginRight: 16,
+  },
+  messageContent: {
+    flex: 1,
+  },
+  messageHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
   },
   name: {
     fontWeight: 'bold',
+    fontSize: 16,
   },
-  status: {
-    color: 'green',
+  time: {
+    color: 'gray',
+    fontSize: 12,
   },
-  sendingContainer: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    
-    paddingBottom:5
-  },
-  bottomBar: {
-   
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 10,
-    backgroundColor: '#fff',
-  },
-  input: {
-    flex: 1,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 20,
-    padding: 10,
-    marginHorizontal: 10,
-  },
-  icon: {
-    padding: 10,
+  message: {
+    color: 'gray',
+    fontSize: 14,
   },
 });
 
-export default ChatScreen;
+export default MessagesScreen;
