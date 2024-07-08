@@ -62,7 +62,7 @@ app.get('/api/messages/:session', async (req, res) => {
 // Routes
 app.use('/api/message', messageRoutes);
 app.use('/api/item', itemRoutes);
-app.use('/auth/user', userRoutes);
+app.use('/api/user', userRoutes);
 app.use('/api/session', sessionRoutes);
 
 // Connect to DB and start server

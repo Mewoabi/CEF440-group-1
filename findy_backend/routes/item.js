@@ -7,7 +7,7 @@ const {
   updateItemPost, 
   getAllUserPosts
 } = require('../controllers/itemController')
-const requireAuth = require('../middleware/requireAuth')
+// const requireAuth = require('../middleware/requireAuth')
 
 const router = express.Router()
 

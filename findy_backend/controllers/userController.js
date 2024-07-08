@@ -7,16 +7,16 @@ const createToken = (_id) => {
 
 // login a user
 const loginUser = async (req, res) => {
-  const {email, password} = req.body
+  const {email: reqEmail, password: reqPass} = req.body
 
   try {
-    const user = await User.login(email, password)
-
-    const {password: user_password, createdAt, updatedAt, __v, ...wantedUserProps} = user
+    const user = await User.login(reqEmail, reqPass)
+ 
     // create a token
     const token = createToken(user._id)
+    const {_id: id, profileImage, username, email, password, phoneNumber} = user._doc
     // console.log(user)
-    res.status(200).json({...wantedUserProps, token})
+    res.status(200).json({user: {id, profileImage, username, email, password, phoneNumber}, token})
   } catch (error) {
     res.status(400).json({error: error.message})
   }
@@ -25,18 +25,18 @@ const loginUser = async (req, res) => {
 // signup a user
 const signupUser = async (req, res) => {
   const {username, email, password , phoneNumber } = req.body
-
+  console.log("signing up user")
   try {
     const user = await User.signup(email, password, phoneNumber, username)
-    const {password: dbpass, createdAt, updatedAt, __v, ...wantedUserProps} = user
+    const {_id: id, profileImage, username, email, password, phoneNumber} = user._doc
     // create a token
     const token = createToken(user._id)
     // console.log(user)
-    res.status(200).json({...wantedUserProps, token})
+    res.status(200).json({user: {id, profileImage, username, email, password, phoneNumber}, token})
   } catch (error) {
-    res.status(400).json({error: error.message})
+    res.status(400).json({error: error.message}) 
     console.log(error.message)
-  }
+  } 
 }
 
 const updateUserProfile = async (req, res) => {
