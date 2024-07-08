@@ -7,6 +7,8 @@ import 'react-native-reanimated';
 import { PaperProvider } from 'react-native-paper';
 
 import { useColorScheme } from '@/hooks/useColorScheme';
+import UserContextProvider from '@/contexts/userContext';
+import PostContextProvider from '@/contexts/postContext';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -35,18 +37,22 @@ export default function RootLayout() {
 
   return (
     <PaperProvider>
+    <UserContextProvider>
+      <PostContextProvider>
+        
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack screenOptions={{
-        headerShown: false
-      }}>
-        {/* this index stands for the welcome page and it is the first page i want someone to see when the enter the app */}
-        <Stack.Screen name="index" options={{ headerShown: false }} />  
-        <Stack.Screen name="(drawer)" options={{ headerShown: false }} /> 
-        <Stack.Screen name="(sidepages)" options={{ headerShown: false }} /> 
-        <Stack.Screen name="+not-found" />
-      </Stack>
-    </ThemeProvider>
+          <Stack screenOptions={{
+            headerShown: false
+          }}>
+            {/* this index stands for the welcome page and it is the first page i want someone to see when the enter the app */}
+            <Stack.Screen name="index" options={{ headerShown: false }} />
+            <Stack.Screen name="(drawer)" options={{ headerShown: false }} />
+            <Stack.Screen name="(sidepages)" options={{ headerShown: false }} />
+            <Stack.Screen name="+not-found" />
+          </Stack>
+        </ThemeProvider>
+      </PostContextProvider>
+    </UserContextProvider>
     </PaperProvider>
   );
 }
- 

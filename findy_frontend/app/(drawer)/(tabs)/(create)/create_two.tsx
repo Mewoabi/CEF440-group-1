@@ -2,17 +2,23 @@
 import { StyleSheet, Text, View, Image, Button, TouchableOpacity, TextInput, ScrollView } from 'react-native'
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import * as imagePicker from 'expo-image-picker'
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { ThemedView } from '@/components/ThemedView'
 import { ThemedText } from '@/components/ThemedText'
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import defaultImg from '../../../../assets/images/icon.png';
 import { storage } from '@/connections/firebaseConfig';
+import { ItemContext } from '@/contexts/itemContext';
+import { itemInterface } from '@/types/item';
+import { FullWindowOverlay } from 'react-native-screens';
+import { PostContext } from '@/contexts/postContext';
 
 export default function createPage() {
     const [imageUri, setImageUri] = useState(null);
     //state for storing the image once it is gotten from the camera
     const [image, setImage] = useState<string>('')
+    const  {state: {item}, dispatch} = useContext(ItemContext)
+    const  {dispatch: postDispatch} = useContext(PostContext)
 
 //function to take image with the user's camera
 const takePhotoWithCamera = async() => {
@@ -84,6 +90,17 @@ const takePhotoWithCamera = async() => {
             } catch (error: any) {
                 console.log(error.message)
             }
+    }
+
+    const addNewPost  = (image: string) => {
+        let fullItem: itemInterface;
+        fullItem = {...item, imageUrl: image}
+        dispatch({type: 'ADD_ITEM', payload: fullItem}), 
+        postDispatch({type: "ADD_POST", payload: {
+            additionalInfo: fullItem.additionalInfo, 
+            category: fullItem.category,
+            date: 
+        }})
     }
     return (
         //The savetostorage function is resposible for sending the image to the firebase storage while the choosefrom gallery function is for taking an  image from the user gallery
