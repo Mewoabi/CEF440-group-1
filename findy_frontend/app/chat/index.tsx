@@ -1,50 +1,80 @@
-import React, { useState, useEffect } from 'react';
-import { View, Image, StyleSheet, Text, TextInput, TouchableOpacity } from 'react-native';
-import { GiftedChat, Send, IMessage, InputToolbar } from 'react-native-gifted-chat';
+import React, { useState, useEffect, useCallback } from 'react';
+import { View, StyleSheet } from 'react-native';
+import { GiftedChat, Send, IMessage } from 'react-native-gifted-chat';
 import Icon from '@expo/vector-icons/MaterialIcons';
 import { RouteProp, useRoute } from '@react-navigation/native';
+import socketIOClient from 'socket.io-client';
+import axios from 'axios';
+import ChatHeader from './ChatHeader';
 
 type RouteParams = {
   ChatScreen: {
     name: string;
     avatar: string;
+    session: string; // Add session parameter
   };
 };
 
+const ENDPOINT = 'http://192.168.8.105:5500'; // Replace with your server's URL
+
 const ChatScreen: React.FC = () => {
   const route = useRoute<RouteProp<RouteParams, 'ChatScreen'>>();
-  const { name, avatar } = route.params;
+  const { name, avatar, session } = route.params;
   const [messages, setMessages] = useState<IMessage[]>([]);
   const [input, setInput] = useState('');
+  const socket = socketIOClient(ENDPOINT);
 
   useEffect(() => {
-    setMessages([
-      {
-        _id: 1,
-        text: 'Can I get proof?',
-        createdAt: new Date(),
-        user: {
-          _id: 2,
-          name: 'Jhon Abraham',
-          avatar: 'https://example.com/avatar.jpg',
-        },
-      },
-      {
-        _id: 2,
-        text: 'Hey, I saw an ad on the missing Addidas bag. They\'re mine.',
-        createdAt: new Date(),
-        user: {
-          _id: 1,
-          name: 'User',
-        },
-      },
-    ]);
-  }, []);
+    // Join the session room
+    socket.emit('joinSession', { session, user: name });
 
-  const onSend = (newMessages: IMessage[] = []) => {
+    socket.on('receiveMessage', (message: IMessage) => {
+      setMessages((previousMessages) => GiftedChat.append(previousMessages, [message]));
+    });
+
+    const fetchMessages = async () => {
+      try {
+        const response = await axios.get(`${ENDPOINT}/api/message/${session}`);
+        setMessages(response.data.map((msg: any) => ({
+          _id: msg._id,
+          text: msg.content,
+          createdAt: new Date(msg.createdAt),
+          user: {
+            _id: msg.sender === 'User' ? 1 : 2,
+            name: msg.sender,
+            avatar: msg.sender === 'User' ? '' : avatar, // Adjust as needed
+          },
+        })));
+      } catch (error) {
+        console.error('Failed to fetch messages:', error);
+      }
+    };
+
+    fetchMessages();
+
+    return () => {
+      socket.disconnect();
+    };
+  }, [session]);
+
+  const onSend = useCallback((newMessages: IMessage[] = []) => {
     setMessages((previousMessages) => GiftedChat.append(previousMessages, newMessages));
-    setInput('');
-  };
+    const message = {
+      session,
+      sender: 'User',
+      content: newMessages[0].text,
+    };
+    socket.emit('sendMessage', message);
+
+    // Save message to the backend
+    axios.post(`${ENDPOINT}/api/message`, message)
+      .then(response => {
+        console.log('Message saved:', response.data);
+      })
+      .catch(error => {
+        console.error('Failed to save message:', error);
+      });
+  }, [session]);
 
   const handleSend = () => {
     if (input.trim()) {
@@ -54,10 +84,11 @@ const ChatScreen: React.FC = () => {
         createdAt: new Date(),
         user: {
           _id: 1,
-          name: 'User',
+          name: name,
         },
       };
       onSend([newMessage]);
+      setInput('');
     }
   };
 
@@ -69,49 +100,20 @@ const ChatScreen: React.FC = () => {
     </Send>
   );
 
-  const renderInputToolbar = (props: any) => (
-    <View >
-    <View style={styles.bottomBar}>
-      <TouchableOpacity style={styles.icon}>
-        <Icon name="attach-file" size={28} color="#007AFF" />
-      </TouchableOpacity>
-      <TextInput
-        style={styles.input}
-        placeholder="Write your message..."
-        value={input}
-        onChangeText={setInput}
-        onSubmitEditing={handleSend}
-      />
-      <TouchableOpacity style={styles.icon} onPress={handleSend}>
-        <Icon name="send" size={28} color="#007AFF" />
-      </TouchableOpacity>
-    </View>
-    </View>
-  );
-
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <Image style={styles.avatar} source={{ uri: avatar }} />
-        <View>
-          <Text style={styles.name}>{name}</Text>
-          <Text style={styles.status}>Active now</Text>
-        </View>
-      </View>
-   
+      <ChatHeader name={name} avatar={avatar} status='online'/>
       <GiftedChat
         messages={messages}
-        onSend={(messages: any) => onSend(messages)}
+        onSend={(messages) => onSend(messages)}
         user={{
           _id: 1,
           name: 'User',
         }}
         renderSend={renderSend}
-        renderInputToolbar={renderInputToolbar}
         placeholder="Write your message..."
       />
-      </View>
-    
+    </View>
   );
 };
 
@@ -119,49 +121,12 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f5f5f5',
-    paddingVertical: 30
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 10,
-    backgroundColor: '#fff',
-  },
-  avatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    marginRight: 10,
-  },
-  name: {
-    fontWeight: 'bold',
-  },
-  status: {
-    color: 'green',
   },
   sendingContainer: {
     justifyContent: 'center',
     alignItems: 'center',
-    
-    paddingBottom:5
-  },
-  bottomBar: {
-   
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 10,
-    backgroundColor: '#fff',
-  },
-  input: {
-    flex: 1,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 20,
-    padding: 10,
-    marginHorizontal: 10,
-  },
-  icon: {
-    padding: 10,
+    marginRight: 10,
+    marginBottom: 5,
   },
 });
 
