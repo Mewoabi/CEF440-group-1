@@ -5,6 +5,7 @@ const router = express.Router();
 // Route to get or create a session between two users
 router.post('/getOrCreateSession', async (req, res) => {
   const { user1, user2 } = req.body;
+  console.log(user1, user2);
   try {
     let session = await Session.findOne({ participants: { $all: [user1, user2] } });
     if (!session) {

@@ -4,10 +4,11 @@ const express = require('express');
 const mongoose = require('mongoose');
 const http = require('http');
 const socketIO = require('socket.io');
-const Message = require('./models/messageModel'); // Adjust the path to your Message model
+const Message = require('./models/messageModel');
 const itemRoutes = require('./routes/item');
 const userRoutes = require('./routes/user');
 const messageRoutes = require('./routes/message');
+const sessionRoutes = require('./routes/session');
 
 // Express app
 const app = express();
@@ -32,29 +33,37 @@ app.use((req, res, next) => {
 io.on('connection', (socket) => {
   console.log(`⚡: ${socket.id} user just connected!`);
 
+  socket.on('joinSession', ({ session, user }) => {
+    socket.join(session);
+    console.log(`${user} joined session: ${session}`);
+  });
+
   socket.on('sendMessage', async (message) => {
     const newMessage = new Message(message);
     await newMessage.save();
     console.log(newMessage);
-    io.emit('receiveMessage', message);
+    io.to(message.session).emit('receiveMessage', message);
   });
 
   socket.on('disconnect', () => {
     console.log('🔥: A user disconnected');
   });
 });
-
-// Fetch all messages for a session
 app.get('/api/messages/:session', async (req, res) => {
   const { session } = req.params;
-  const messages = await Message.find({ session }).sort({ createdAt: -1 }).exec();
-  res.json(messages);
+  try {
+    const messages = await Message.find({ session }).sort({ createdAt: -1 }).exec();
+    res.json(messages);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
 });
 
 // Routes
-app.use('/api/message', messageRoutes); // Corrected this line
+app.use('/api/message', messageRoutes);
 app.use('/api/item', itemRoutes);
 app.use('/auth/user', userRoutes);
+app.use('/api/session', sessionRoutes);
 
 // Connect to DB and start server
 mongoose

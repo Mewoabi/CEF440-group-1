@@ -1,58 +1,101 @@
-import { Link, useRouter } from 'expo-router';
-import React from 'react';
-import { View, Text, FlatList, StyleSheet, Image } from 'react-native';
-import { Button } from 'react-native-paper';
+import {  useRouter,Link } from 'expo-router';
+import { useEffect, useState } from 'react';
+import { View, Text, FlatList, StyleSheet, Image, ActivityIndicator, RefreshControl, TouchableOpacity } from 'react-native';
+import axios from 'axios';
 
-const messages = [
-  {
-    id: '1',
-    name: 'Bruno Mars',
-    message: 'I found the Brown bag in class',
-    time: '12:30 PM',
-    avatar: 'https://randomuser.me/api/portraits/women/26.jpg', // Replace with actual image URL
-  },
-  {
-    id: '2',
-    name: 'Samantha Brenda',
-    message: 'Send proofs',
-    time: '5:00 PM',
-    avatar: 'https://randomuser.me/api/portraits/men/26.jpg', // Replace with actual image URL
-  },
-  // Add more messages as needed
-];
+const ENDPOINT = 'http://192.168.8.105:5500'; // Replace with your server's URL
 
 const MessagesScreen = () => {
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const router = useRouter();
+
+  const fetchUsers = async () => {
+    try {
+      const response = await axios.get(`${ENDPOINT}/auth/user/users`);
+      setUsers(response.data);
+    } catch (error) {
+      console.error('Failed to fetch users:', error);
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  const handleRefresh = () => {
+    setRefreshing(true);
+    fetchUsers();
+  };
+
+  const handleChatPress = async (user:any) => {
+    try {
+      const currentUser = { _id: '666f3875e1400843374ec080' }; // Replace with the actual current user ID
+      const response = await axios.post(`${ENDPOINT}/api/session/getOrCreateSession`, {
+        user1: currentUser._id,
+        user2: user._id,
+      });
+      
+      const session = response.data;
+      console.log(session._id)
+      router.push({
+        pathname: '/chat',
+        params: { 
+          name: user.username,
+          avatar: user.profileImage || "https://randomuser.me/api/portraits/women/26.jpg",
+          session: session?._id,
+        }
+      });
+    } catch (error) {
+      console.error('Failed to create or get session:', error);
+    }
+  };
+
   const renderItem = ({ item }:any) => (
-    <Link 
-   href={{
-    pathname: '/chat',
-    params: { name: item.name,avatar:item.avatar, time: item.time, message: item.message }
-   }}>
-    <View style={styles.messageContainer}>
-      <Image source={{ uri: item.avatar }} style={styles.avatar} />
-      <View style={styles.messageContent}>
-        <View style={styles.messageHeader}>
-          <Text style={styles.name}>{item.name}</Text>
-          <Text style={styles.time}>{item.time}</Text>
+    <Link href={'/chat'} onPress={() => handleChatPress(item)}>
+      <View style={styles.messageContainer}>
+        <Image source={{ uri: item.profileImage || "https://randomuser.me/api/portraits/women/26.jpg" }} style={styles.avatar} />
+        <View style={styles.messageContent}>
+          <View style={styles.messageHeader}>
+            <Text style={styles.name}>{item.username}</Text>
+            <Text style={styles.time}>Active now</Text>
+          </View>
+          <Text style={styles.message}>Start chatting with {item.username}</Text>
         </View>
-        <Text style={styles.message}>{item.message}</Text>
       </View>
-    </View>
     </Link>
   );
 
   return (
-    <FlatList
-      data={messages}
-      keyExtractor={(item) => item.id}
-      renderItem={renderItem}
-      contentContainerStyle={styles.list}
-    />
+    <View style={styles.container}>
+      {loading ? (
+        <ActivityIndicator size="large" color="#0000ff" />
+      ) : (
+        <FlatList
+          data={users}
+          keyExtractor={(item) => item._id}
+          renderItem={renderItem}
+          contentContainerStyle={styles.list}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+          }
+        />
+      )}
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'white',
+  },
   list: {
     padding: 16,
     backgroundColor: 'white',
@@ -61,7 +104,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: 15,
-    
   },
   avatar: {
     width: 40,
