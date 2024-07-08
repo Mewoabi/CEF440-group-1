@@ -6,12 +6,13 @@ import { router, usePathname } from 'expo-router';
 import { TabBarIcon } from '@/components/navigation/TabBarIcon';
 import { Feather, Ionicons } from '@expo/vector-icons';
 import { Image, StyleSheet, View } from 'react-native';
-import { useEffect } from 'react';
+import { useContext, useEffect } from 'react';
 import { useThemeColor } from '@/hooks/useThemeColor';
 import { Colors } from '@/constants/Colors';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView'; 
 import defaultImg from '../../assets/images/icon.png';
+import { UserContext } from '@/contexts/userContext';
 
 export default function Layout() {
 
@@ -20,6 +21,8 @@ export default function Layout() {
     useEffect(() => {
       console.log(pathname)
     }, [pathname])
+
+    const {state: {user}} = useContext(UserContext)
 
     return (
       <DrawerContentScrollView  {...props}>
@@ -32,11 +35,11 @@ export default function Layout() {
         }}
       /> */}
         <ThemedView style={{...styles.userDetsWrapper,  borderColor: useThemeColor({light: "#ccc", dark: "#666"}, 'text')}}>
-          <Image style={styles.userImage} source={require('../../assets/images/profile.jpeg')}  />
-
+          {user.profileImage ? <Image style={styles.userImage} source={{uri: user.profileImage}}  /> :
+          <Image style={styles.userImage} source={require('../../assets/images/profile.jpeg')}  />}
           <ThemedView>
-            <ThemedText style={styles.userName}>Mewoab Doray</ThemedText>
-            <ThemedText style={styles.userEmail}>mewoabid@gmail.com</ThemedText>
+            <ThemedText style={styles.userName}>{user.username}</ThemedText>
+            <ThemedText style={styles.userEmail}>{user.email}</ThemedText>
           </ThemedView>
         </ThemedView>
         <DrawerItem

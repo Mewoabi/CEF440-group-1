@@ -7,14 +7,20 @@ import { ThemedView } from '@/components/ThemedView';
 import Post from '@/components/post';
 import { test_posts } from '@/utils/testPost'; 
 import { postInterface } from '@/components/post';
+import { useContext } from 'react';
+import { UserContext } from '@/contexts/userContext';
+import { PostContext } from '@/contexts/postContext';
 
 export default function HomeScreen() {
+  const {state: {user}} = useContext(UserContext)
+  const {state: {posts}} = useContext(PostContext)
+  console.log(user)
   return (
     <ThemedView style={styles.container}> 
        {/* <Post post={test_posts[0]}/> */}
        <FlatList 
        keyExtractor={(item) => item.id}
-        data={test_posts}
+        data={posts}
         renderItem={({item}) => (<Post post={item}/>)}
        />
     </ThemedView>

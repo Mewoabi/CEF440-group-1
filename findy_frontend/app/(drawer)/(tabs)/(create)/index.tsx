@@ -1,7 +1,7 @@
 import { StyleSheet, Text, Image, Button, TouchableOpacity, TextInput, ScrollView } from 'react-native'
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import * as imagePicker from 'expo-image-picker'
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { ThemedView } from '@/components/ThemedView'
 import { ThemedText } from '@/components/ThemedText'
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
@@ -9,6 +9,8 @@ import { storage } from '@/connections/firebaseConfig';
 import { router } from 'expo-router';
 import { Dropdown } from 'react-native-element-dropdown';
 import AntDesign from '@expo/vector-icons/AntDesign';
+import { ItemContext } from '@/contexts/itemContext';
+import { categoryType, itemInterface } from '@/types/item';
 
 const data = [
     { label: 'Item 1', value: '1' },
@@ -42,15 +44,39 @@ const categories = [
 export default function createPage() {
     const [value, setValue] = useState("null");
     const [isFocus, setIsFocus] = useState(false);
+    const {state: {item}, dispatch} = useContext(ItemContext)
 
+    const [title, setTitle] = useState(item.title)
+    const [name, setName] = useState(item.name)
+    const [description, setDescription] = useState(item.description)
+    const [color, setColor] = useState(item.additionalInfo.color)
+    const [brand, setBrand] = useState(item.additionalInfo.brand)
+    const [content, setContent] = useState(item.additionalInfo.content)
+    const [state, setState] = useState(item.additionalInfo.state)
+    const [category, setCategory] = useState<categoryType>(item.category)
+    const [location, setLocation] = useState(item.location)
+    const [reporter, setReporter] = useState(item.reporter)
+    const [type, setType] = useState(item.type)
+    const [imageUrl, setImageUrl] = useState(item.imageUrl)
+   
+    const handleContinue = () => {
+        const partItem: itemInterface = {title, name, description, additionalInfo: {color, brand, content, state}, category, location, reporter, type, imageUrl}
+
+        dispatch({type: 'ADD_ITEM', payload: partItem})
+        router.push('./create_two')
+    }
 
     return (
         <ScrollView>
             <ThemedView style={styles.container}>
                 <ThemedView>
                     <ThemedText style={styles.report}>Enter Item Information</ThemedText>
+                    <ThemedText style={styles.text}>Post title</ThemedText>
+                    <TextInput style={styles.textInput} value={title} onChangeText={(val) => setTitle(val)}/>
+                </ThemedView>
+                <ThemedView> 
                     <ThemedText style={styles.text}>Item name</ThemedText>
-                    <TextInput style={styles.textInput} />
+                    <TextInput style={styles.textInput} value={name} onChangeText={(val) => setName(val)}/>
                 </ThemedView>
                 <ThemedView>
                     <ThemedText style={styles.text}>Category</ThemedText>
@@ -67,51 +93,58 @@ export default function createPage() {
                         valueField="value"
                         placeholder={!isFocus ? 'Select item' : '...'}
                         searchPlaceholder="Search..."
-                        value={value}
+                        value={category}
                         onFocus={() => setIsFocus(true)}
                         onBlur={() => setIsFocus(false)}
                         onChange={item => {
                             setValue(item.value);
+                            setCategory(item.value as categoryType)
                             setIsFocus(false);
                         }}
                     />
                 </ThemedView>
                 <ThemedView style={styles.status_view}>
                     <ThemedText style={styles.status_label}>Status:</ThemedText>
-                    <TouchableOpacity style={styles.status_button}>
+                    <TouchableOpacity 
+                    style={{...styles.status_button, backgroundColor: type == 'found' ? "#6C63FF" : "#ccc"}}
+                    onPress={()=> {setType('lost')}}
+                    >
                         <ThemedText style={styles.status_button_text}>Lost</ThemedText>
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.status_button}>
+                    <TouchableOpacity
+                     style={{...styles.status_button, backgroundColor: type == 'found' ? "#6C63FF" : "#ccc"}}
+                     onPress={() => setType('found')}
+                     >
                         <ThemedText style={styles.status_button_text}>Found</ThemedText>
                     </TouchableOpacity>
                 </ThemedView>
                 <ThemedView>
                     <ThemedText style={styles.text}>Description</ThemedText>
-                    <TextInput multiline style={styles.textInput} />
+                    <TextInput multiline style={styles.textInput} value={(description)} onChangeText={(val) => setDescription(val)}/>
                     <ThemedText style={styles.text}>Additional information</ThemedText>
                     <ThemedView style={styles.additional_view}>
                         <ThemedView style={styles.additional_box}>
                             <ThemedText style={styles.additional_label}>color: </ThemedText>
-                            <TextInput style={styles.additional_field} placeholder='color of the object' />
+                            <TextInput style={styles.additional_field} placeholder='color of the object' value={color} onChangeText={(val) => setColor(val)}/>
                         </ThemedView>
                         <ThemedView style={styles.additional_box}>
                             <ThemedText style={styles.additional_label}>Brand: </ThemedText>
-                            <TextInput style={styles.additional_field} placeholder='Item brand' />
+                            <TextInput style={styles.additional_field} placeholder='Item brand' value={brand} onChangeText={(val) => setBrand(brand)}/>
                         </ThemedView>
                         <ThemedView style={styles.additional_box}>
                             <ThemedText style={styles.additional_label}>content: </ThemedText>
-                            <TextInput style={styles.additional_field} placeholder='contents of the object' />
+                            <TextInput style={styles.additional_field} placeholder='contents of the object' value={content} onChangeText={(val) => setContent(val)}/>
                         </ThemedView>
                         <ThemedView style={styles.additional_box}>
                             <ThemedText style={styles.additional_label}>state: </ThemedText>
-                            <TextInput style={styles.additional_field} placeholder='old, new, torn, wet, etc..' />
+                            <TextInput style={styles.additional_field} placeholder='old, new, torn, wet, etc..' value={state} onChangeText={(val) => setState(val)}/>
                         </ThemedView>
                     </ThemedView>
                     <ThemedText style={styles.text}>Location</ThemedText>
-                    <TextInput style={styles.textInput} />
+                    <TextInput style={styles.textInput} value={location} onChangeText={(val) => setLocation(val)}/>
                 </ThemedView>
                 <ThemedView>
-                    <TouchableOpacity style={styles.continue_button} onPress={() => router.push('./create_two')}>
+                    <TouchableOpacity style={styles.continue_button} onPress={() => handleContinue()}>
                         <ThemedText style={styles.button_text}>continue</ThemedText>
                     </TouchableOpacity>
                 </ThemedView>
