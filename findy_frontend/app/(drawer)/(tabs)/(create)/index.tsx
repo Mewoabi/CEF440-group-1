@@ -1,4 +1,4 @@
-import { StyleSheet, Text, Image, Button, TouchableOpacity, TextInput, ScrollView } from 'react-native'
+import { StyleSheet, Text, Image, Button, TouchableOpacity, TextInput, ScrollView, Alert } from 'react-native'
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import * as imagePicker from 'expo-image-picker'
 import React, { useContext, useEffect, useState } from 'react'
@@ -11,6 +11,7 @@ import { Dropdown } from 'react-native-element-dropdown';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import { ItemContext } from '@/contexts/itemContext';
 import { categoryType, itemInterface } from '@/types/item';
+import { UserContext } from '@/contexts/userContext';
 
 const data = [
     { label: 'Item 1', value: '1' },
@@ -45,6 +46,7 @@ export default function createPage() {
     const [value, setValue] = useState("null");
     const [isFocus, setIsFocus] = useState(false);
     const {state: {item}, dispatch} = useContext(ItemContext)
+    const {state:{user} } = useContext(UserContext)
 
     const [title, setTitle] = useState(item.title)
     const [name, setName] = useState(item.name)
@@ -60,9 +62,14 @@ export default function createPage() {
     const [imageUrl, setImageUrl] = useState(item.imageUrl)
    
     const handleContinue = () => {
-        const partItem: itemInterface = {title, name, description, additionalInfo: {color, brand, content, state}, category, location, reporter, type, imageUrl}
+        if(title && name && description && color && brand && content && state && category && location && location && type){
+            Alert.alert("Please Fill all the field first!")
+        }
 
-        dispatch({type: 'ADD_ITEM', payload: partItem})
+        let partPost: itemInterface;
+        partPost = {title, name, description, additionalInfo: {color, brand, content, state}, category, location, reporter: user.id , type, imageUrl}
+
+        dispatch({type: 'ADD_ITEM', payload: partPost})
         router.push('./create_two')
     }
 
