@@ -19,7 +19,7 @@ app.use((req, res, next) => {
 
 // routes
 app.use('/api/item', itemRoutes)
-app.use('/auth/user', userRoutes)
+app.use('/api/user', userRoutes)
 
 // connect to db
 mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
