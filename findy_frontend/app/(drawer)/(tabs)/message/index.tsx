@@ -1,10 +1,6 @@
-import { ThemedView } from '@/components/ThemedView';
-import { Colors } from '@/constants/Colors';
-import { useThemeColor } from '@/hooks/useThemeColor';
 import { Link, useRouter } from 'expo-router';
 import React from 'react';
-import { View, Text, FlatList, StyleSheet, Image, Touchable } from 'react-native';
-import { TouchableOpacity } from 'react-native-gesture-handler';
+import { View, Text, FlatList, StyleSheet, Image } from 'react-native';
 import { Button } from 'react-native-paper';
 
 const messages = [
@@ -27,60 +23,45 @@ const messages = [
 
 const MessagesScreen = () => {
   const router = useRouter();
-  const renderItem = ({ item }: any) => (
-    // <Link
-    //   href={{
-    //     pathname: '/chat',
-    //     params: { name: item.name, avatar: item.avatar, time: item.time, message: item.message }
-    //   }} style = {styles.link_container}>
-    <TouchableOpacity onPress={() => router.push({
-      pathname: '/chat',
-      params: { name: item.name, avatar: item.avatar, time: item.time, message: item.message }
-    })} style = {styles.link_container}>
-      <View style={styles.messageContainer}>
-        <Image source={{ uri: item.avatar }} style={styles.avatar} />
-        <View style={styles.messageContent}>
-          <View style={styles.messageHeader}>
-            <Text style={styles.name}>{item.name}</Text>
-            <Text style={styles.time}>{item.time}</Text>
-          </View>
-          <Text style={styles.message}>{item.message}</Text>
+  const renderItem = ({ item }:any) => (
+    <Link 
+   href={{
+    pathname: '/chat',
+    params: { name: item.name,avatar:item.avatar, time: item.time, message: item.message }
+   }}>
+    <View style={styles.messageContainer}>
+      <Image source={{ uri: item.avatar }} style={styles.avatar} />
+      <View style={styles.messageContent}>
+        <View style={styles.messageHeader}>
+          <Text style={styles.name}>{item.name}</Text>
+          <Text style={styles.time}>{item.time}</Text>
         </View>
+        <Text style={styles.message}>{item.message}</Text>
       </View>
-    </TouchableOpacity>
-
-    // </Link>
+    </View>
+    </Link>
   );
 
   return (
-    <ThemedView>
-      <FlatList style={styles.list_container}
-        data={messages}
-        keyExtractor={(item) => item.id}
-        renderItem={renderItem}
-        contentContainerStyle={styles.list}
-      />
-    </ThemedView>
+    <FlatList
+      data={messages}
+      keyExtractor={(item) => item.id}
+      renderItem={renderItem}
+      contentContainerStyle={styles.list}
+    />
   );
 };
 
 const styles = StyleSheet.create({
-  list_container: {
-    marginBottom: 450,
-    width: "100%"
-  },
   list: {
     padding: 16,
     backgroundColor: 'white',
   },
   messageContainer: {
-    display: "flex",
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 8,
-    borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
-    justifyContent: "space-between", 
+    paddingVertical: 15,
+    
   },
   avatar: {
     width: 40,
@@ -107,9 +88,6 @@ const styles = StyleSheet.create({
     color: 'gray',
     fontSize: 14,
   },
-  link_container: {
-    width: '100%', 
-  }
 });
 
 export default MessagesScreen;

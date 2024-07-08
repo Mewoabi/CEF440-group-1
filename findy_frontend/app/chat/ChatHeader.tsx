@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
-import { Avatar, Text, IconButton } from 'react-native-paper';
-
+import { Avatar, Text, IconButton, Icon } from 'react-native-paper';
+import { useNavigation } from 'expo-router';
 interface ChatHeaderProps {
   avatar: string;
   name: string;
@@ -9,8 +9,10 @@ interface ChatHeaderProps {
 }
 
 const ChatHeader: React.FC<ChatHeaderProps> = ({ avatar, name, status }) => {
+  const Navigate=useNavigation()
   return (
     <View style={styles.container}>
+      <IconButton onPress={()=>Navigate.goBack()} icon='status'/>
       <Avatar.Image size={40} source={{ uri: avatar }} />
       <View style={styles.infoContainer}>
         <Text style={styles.name}>{name}</Text>
@@ -40,6 +42,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderBottomWidth: 1,
     borderBottomColor: '#ddd',
+    marginTop:10,
+    paddingTop:25,
   },
   infoContainer: {
     flex: 1,
