@@ -11,6 +11,8 @@ import { Colors } from '@/constants/Colors'
 import { router } from 'expo-router'
 
 const index = () => {
+    
+
     return (
         <ScrollView>
             <ThemedView style={styles.container}>

@@ -113,7 +113,7 @@ export default function createPage() {
                 <ThemedView style={styles.status_view}>
                     <ThemedText style={styles.status_label}>Status:</ThemedText>
                     <TouchableOpacity 
-                    style={{...styles.status_button, backgroundColor: type == 'found' ? "#6C63FF" : "#ccc"}}
+                    style={{...styles.status_button, backgroundColor: type == 'lost' ? "#6C63FF" : "#ccc"}}
                     onPress={()=> {setType('lost')}}
                     >
                         <ThemedText style={styles.status_button_text}>Lost</ThemedText>
@@ -136,7 +136,7 @@ export default function createPage() {
                         </ThemedView>
                         <ThemedView style={styles.additional_box}>
                             <ThemedText style={styles.additional_label}>Brand: </ThemedText>
-                            <TextInput style={styles.additional_field} placeholder='Item brand' value={brand} onChangeText={(val) => setBrand(brand)}/>
+                            <TextInput style={styles.additional_field} placeholder='Item brand' value={brand} onChangeText={(val) => setBrand(val)}/>
                         </ThemedView>
                         <ThemedView style={styles.additional_box}>
                             <ThemedText style={styles.additional_label}>content: </ThemedText>

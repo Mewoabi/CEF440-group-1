@@ -26,7 +26,7 @@ export interface postInterface {
   category: string,
   imageUrl: string,
   reporterName: string,
-  reporterProfile: string,
+  reporterProfile: string | null,
   date: string
 }
 
@@ -45,7 +45,8 @@ const Post = ({ post }: postProps) => {
     <ThemedView style={styles.post_container}>
       {/* poster profile image with name and date poster */}
       <ThemedView style={styles.post_profile}>
-        <Image source={{ uri: post.reporterProfile }} style={styles.post_profile_image} />
+        { post.reporterProfile ?  <Image source={{ uri: post.reporterProfile }} style={styles.post_profile_image} /> :
+        <Image source={require('../assets/images/profile.jpeg')} style={styles.post_profile_image} />}
         <ThemedView style={styles.post_profile_info}>
           <ThemedText>{post.reporterName}</ThemedText>
           <ThemedText>{post.date}</ThemedText>
@@ -64,7 +65,7 @@ const Post = ({ post }: postProps) => {
                 <ThemedText>{post.location}</ThemedText>
               </ThemedView>
             </ThemedView>
-            <Link style={styles.post_content_link} href={'../../../(sidepages)/details/[id]'}>view more &gt;</Link>
+            <Link style={styles.post_content_link} href={{pathname: '../../../(sidepages)/details/', params: {id: JSON.stringify(post)}}}>view more &gt;</Link>
           </ThemedView>
           <ThemedView style={styles.post_content_info_icons}>
             <ThemedView style={styles.post_content_icons_unit}>

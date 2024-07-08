@@ -1,5 +1,5 @@
  
-import { StyleSheet, Text, View, Image, Button, TouchableOpacity, TextInput, ScrollView } from 'react-native'
+import { StyleSheet, Text, View, Image, Button, TouchableOpacity, TextInput, ScrollView, Alert } from 'react-native'
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import * as imagePicker from 'expo-image-picker'
 import React, { useContext, useEffect, useState } from 'react'
@@ -12,6 +12,9 @@ import { ItemContext } from '@/contexts/itemContext';
 import { itemInterface } from '@/types/item';
 import { FullWindowOverlay } from 'react-native-screens';
 import { PostContext } from '@/contexts/postContext';
+import {format} from 'date-fns'
+import { UserContext } from '@/contexts/userContext';
+import { router } from 'expo-router';
 
 export default function createPage() {
     const [imageUri, setImageUri] = useState(null);
@@ -19,6 +22,7 @@ export default function createPage() {
     const [image, setImage] = useState<string>('')
     const  {state: {item}, dispatch} = useContext(ItemContext)
     const  {dispatch: postDispatch} = useContext(PostContext)
+    const  {state: {user}} = useContext(UserContext)
 
 //function to take image with the user's camera
 const takePhotoWithCamera = async() => {
@@ -99,8 +103,21 @@ const takePhotoWithCamera = async() => {
         postDispatch({type: "ADD_POST", payload: {
             additionalInfo: fullItem.additionalInfo, 
             category: fullItem.category,
-            date: 
+            date: format(new Date(), 'MM/dd/yyyy'),
+            description: fullItem.description,
+            id: `${new Date().getMilliseconds} ${Math.random() * 1000}`, 
+            imageUrl: image, 
+            location: fullItem.location,
+            name: fullItem.name,
+            reporterId: fullItem.reporter,
+            reporterName: user.username, 
+            reporterProfile: user.profileImage, 
+            title: fullItem.title, 
+            type: fullItem.type
         }})
+        Alert.alert("report successful")
+        router.push("/(drawer)")
+        
     }
     return (
         //The savetostorage function is resposible for sending the image to the firebase storage while the choosefrom gallery function is for taking an  image from the user gallery
@@ -122,7 +139,7 @@ const takePhotoWithCamera = async() => {
                 </TouchableOpacity>
             </ThemedView>
 
-            <TouchableOpacity style={styles.report_button} onPress={() => saveImageToStorage(image)}>
+            <TouchableOpacity style={styles.report_button} onPress={() => addNewPost(image)}>
                 <MaterialCommunityIcons name="briefcase" size={24} color="white" />
                 <ThemedText style={styles.report_button_text}> Report Item </ThemedText>
             </TouchableOpacity>
