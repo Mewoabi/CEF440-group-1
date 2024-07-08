@@ -4,6 +4,7 @@ import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import 'react-native-reanimated';
+import { PaperProvider } from 'react-native-paper';
 
 import { useColorScheme } from '@/hooks/useColorScheme';
 import UserContextProvider from '@/contexts/userContext';
@@ -35,9 +36,11 @@ export default function RootLayout() {
   }
 
   return (
+    <PaperProvider>
     <UserContextProvider>
       <PostContextProvider>
-        <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+        
+    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
           <Stack screenOptions={{
             headerShown: false
           }}>
@@ -50,5 +53,6 @@ export default function RootLayout() {
         </ThemeProvider>
       </PostContextProvider>
     </UserContextProvider>
+    </PaperProvider>
   );
 }

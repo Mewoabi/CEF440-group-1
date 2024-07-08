@@ -1,17 +1,18 @@
-const express = require('express')
+const express = require('express');
+const { loginUser, signupUser, updateUserProfile, getAllUsers } = require('../controllers/userController');
 
-// controller functions
-const { loginUser, signupUser, updateUserProfile } = require('../controllers/userController')
+const router = express.Router();
 
-const router = express.Router()
+// Login route
+router.post('/login', loginUser);
 
-// login route
-router.post('/login', loginUser)
+// Signup route
+router.post('/signup', signupUser);
 
-// signup route
-router.post('/signup', signupUser)
+// Update a user's profile
+router.patch('/:id', updateUserProfile);
 
-//update a user's profile
-router.patch('/:id', updateUserProfile)
+// Get all users
+router.get('/users', getAllUsers);
 
-module.exports = router
+module.exports = router;
